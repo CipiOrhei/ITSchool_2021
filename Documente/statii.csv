@@ -1,0 +1,16 @@
+﻿Statia A,Statia B,Km ,Conditie
+Bucharest,Cluj-Napoca,133,Buna
+Bucharest,Timișoara,281,Foarte Buna
+Bucharest,Iași,740,Proasta
+Bucharest,Constanța,474,Foarte Proasta
+Bucharest,Craiova,576,Foarte Buna
+Cluj-Napoca,Timișoara,946,Proasta
+Cluj-Napoca,Iași,547,Foarte Proasta
+Cluj-Napoca,Constanța,885,Proasta
+Cluj-Napoca,Craiova,906,Foarte Proasta
+Timișoara,Iași,99,Foarte Buna
+Timișoara,Constanța,981,Proasta
+Timișoara,Craiova,355,Buna
+Iași,Constanța,443,Foarte Buna
+Iași,Craiova,499,Proasta
+Constanța,Craiova,646,Foarte Proasta
