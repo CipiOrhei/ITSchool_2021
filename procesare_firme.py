@@ -3,8 +3,9 @@ Modul care gestioneaza firmele
 """
 import glob
 from docx import Document
+import re
 
-LOCATIE_FOLDER_FIRME = r"c:\repos\ITSchool_2021\Documente\firme_licitatie"
+LOCATIE_FOLDER_FIRME = r"./Documente/firme_licitatie/"
 LISTA_FIRME_DISPONIBILE = list()
 
 class Firme:
@@ -57,19 +58,131 @@ def citire_document_word(cale: str) -> dict:
     """
     tmp_dict = dict()
     document = Document(cale)
+    print(cale)
     for para in document.paragraphs:
-        pass
+        # print(para.text)
+        detalii_firme = para.text
+
+        # am scos numele firmei
+        nume_regex = r"(?<=Nume: ).*$"
+        nume_firma = re.findall(nume_regex,detalii_firme)
+        if (nume_firma):
+            nume_firma = modificare_stringuri(nume_firma)
+            print(f"Nume: {nume_firma}")
+            tmp_dict['nume'] = nume_firma
+
+        # am scos locomotivele
+        locomotive_regex = r"(?<=Locomotive: ).*$"
+        detalii_locomotive = re.findall(locomotive_regex,detalii_firme)
+        if (detalii_locomotive):
+            # print(detalii_locomotive)
+            detalii_locomotive = modificare_stringuri(detalii_locomotive)
+            # print(detalii_locomotive)
+            locomotives = str(detalii_locomotive).split(",")
+
+            locomotives_lista = list()
+            for locomotive in locomotives:
+                locomotive_lista = list()
+                # print((locomotive).lstrip(' '))
+                locomotive = ((locomotive).lstrip(' '))
+                locomotive_model_regex = r"(?<=Model ).*$"
+                locomotive_model = re.findall(locomotive_model_regex, locomotive)
+                # print(locomotive_model)
+
+                locomotive_cantitate_regex = r"^.*(?= x)"
+                locomotive_cantitate = re.findall(locomotive_cantitate_regex, locomotive)
+                # print(locomotive_cantitate)
+                locomotive_cantitate = modificare_stringuri(locomotive_cantitate)
+                locomotive_model = modificare_stringuri(locomotive_model)
+                print(f"Locomotive cantitate: {locomotive_cantitate}")
+                print(f"Locomotive model: {locomotive_model}")
+                locomotive_lista.append(locomotive_cantitate)
+                locomotive_lista.append(locomotive_model)
+
+                # cost
+                # print(f"Cost: {cale}")
+                for para in document.paragraphs:
+                    # print(para.text)
+                    detalii_cost = para.text
+
+                    cost_regex_locomotive = fr"(?<=Model {locomotive_model} ).*(?= RON/h)"
+                    cost_locomotive = re.findall(cost_regex_locomotive, detalii_cost)
+                    if (cost_locomotive):
+                        cost_locomotive = modificare_stringuri(cost_locomotive)
+                        print(f"Cost locomotive: {cost_locomotive}")
+                        locomotive_lista.append(cost_locomotive)
+                locomotives_lista.append(locomotive_lista)
+
+            tmp_dict['Locomotive'] = locomotives_lista
+            print(locomotives_lista)
+
+        # am scos vagoanele
+        vagoane_regex = r"(?<=Vagoane: ).*$"
+        detalii_vagoane = re.findall(vagoane_regex,detalii_firme)
+        if (detalii_vagoane):
+            # print(detalii_vagoane)
+            detalii_vagoane = modificare_stringuri(detalii_vagoane)
+            # print(detalii_vagoane)
+            vagons = str(detalii_vagoane).split(",")
+
+            vagones_lista = list()
+            for vagoane in vagons:
+                vagoane_lista = list()
+                # print((vagoane).lstrip(' '))
+                vagoane = ((vagoane).lstrip(' '))
+                vagoane_model_regex = r"(?<=Model ).*$"
+                vagoane_model = re.findall(vagoane_model_regex,vagoane)
+                # print(vagoane_model)
+
+                vagoane_cantitate_regex = r"^.*(?= x)"
+                vagoane_cantitate = re.findall(vagoane_cantitate_regex,vagoane)
+                # print(vagoane_cantitate)
+
+                vagoane_cantitate = modificare_stringuri(vagoane_cantitate)
+                vagoane_model = modificare_stringuri(vagoane_model)
+                print(f"Vagoane cantitate: {vagoane_cantitate}")
+                print(f"Vagoane model: {vagoane_model}")
+                vagoane_lista.append(vagoane_cantitate)
+                vagoane_lista.append(vagoane_model)
+
+                # cost
+                # print(f"Cost: {cale}")
+                for para in document.paragraphs:
+                    # print(para.text)
+                    detalii_cost = para.text
+
+                    cost_regex_vagoane = fr"(?<=Model {vagoane_model} ).*(?= RON/h)"
+                    cost_vagoane = re.findall(cost_regex_vagoane, detalii_cost)
+                    if (cost_vagoane):
+                        cost_vagoane = modificare_stringuri(cost_vagoane)
+                        print(f"Cost vagoane: {cost_vagoane}")
+                        vagoane_lista.append(cost_vagoane)
+
+                vagones_lista.append(vagoane_lista)
+            print(vagones_lista)
+            tmp_dict['Vagoane'] = vagones_lista
+
+
+
         # print('TODO: cu ajutorul regex gasiti informatiile din fiecare paragraf')
         # Populam tmp_dict
         #TODO
     # exemplu:
-    tmp_dict['nume'] = 'FerovTrans SRL'
+    # tmp_dict['nume'] = 'FerovTrans SRL'
     # tupla per locomotiva: (cantitate, model, cost)
-    tmp_dict['Locomotive'] = [(5, 'C', 20), (2, 'B', 30)]
-    # tupla per vagon: (cantitate, model, cost)
-    tmp_dict['Vagoane'] = [(6, 'X30', 35), (5, 'X14', 45), (20, 'X25', 60)]
-
+    # tmp_dict['Locomotive'] = [(5, 'C', 20), (2, 'B', 30)]
+    # # tupla per vagon: (cantitate, model, cost)
+    # tmp_dict['Vagoane'] = [(6, 'X30', 35), (5, 'X14', 45), (20, 'X25', 60)]
+    print(tmp_dict)
     return tmp_dict
+
+def modificare_stringuri(stringuri_de_modificare):
+    char_de_schimbat = "[]'"
+    for ch in char_de_schimbat:
+        stringuri_de_modificare = str(stringuri_de_modificare).replace(ch, "")
+
+    return stringuri_de_modificare
+
 
 
 def salvam_lista_firme_pe_hard():
